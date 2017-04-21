@@ -75,9 +75,12 @@ void LoadLevel(int* level, int height, int width, NoiseMap heightMap)
 
 	for (int i = 0; i <= height - 1; ++i)
 	{
+		std::cout << "ROW" << i << std::endl;
 		for (int j = 0; j <= width - 1; ++j)
 		{
 			float val = heightMap.GetValue(j, i);
+			std::cout << val;
+			/*
 			if (val >= -1.00 && val < -0.25) //deeps
 			{
 				*(level + ind) = 0;
@@ -106,8 +109,27 @@ void LoadLevel(int* level, int height, int width, NoiseMap heightMap)
 			{
 				*(level+ind) = 6;
 			}
+			*/
+			if (val >= -1.00 && val < -0.50) 
+			{
+				*(level + ind) = 0;
+			}
+			else if (val >= -0.50 && val < 0.00) 
+			{
+				*(level + ind) = 1;
+			}
+			else if (val >= 0.00 && val < 0.50) 
+			{
+				*(level + ind) = 2;
+			}
+			else if (val >= 0.50 && val <= 1.0) 
+			{
+				*(level + ind) = 3;
+			}
+			
 			++ind;
 		}
+		std::cout << std::endl;
 	}
 }
 
@@ -137,7 +159,7 @@ int main() {
 	LoadLevel(level, height, width, heightMap);
 	
 	TileMap map;
-	if (!map.load("tileset.png", sf::Vector2u(32, 32), level, 16, 8))
+	if (!map.load("tileMap.png", sf::Vector2u(16, 16), level, 32, 16))
 		return -1;
 
 	// run the main loop
@@ -161,7 +183,7 @@ int main() {
 			heightMapBuilder.Build();
 
 			
-			if (!map.load("tileset.png", sf::Vector2u(32, 32), level, 16, 8))
+			if (!map.load("tileMap.png", sf::Vector2u(16, 16), level, 32, 16))
 				return -1;
 
 		}
