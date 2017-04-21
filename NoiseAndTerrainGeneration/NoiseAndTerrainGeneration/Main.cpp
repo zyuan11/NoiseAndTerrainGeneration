@@ -40,7 +40,7 @@ public:
 				quad[1].position = sf::Vector2f((i + 1) * tileSize.x, j * tileSize.y);
 				quad[2].position = sf::Vector2f((i + 1) * tileSize.x, (j + 1) * tileSize.y);
 				quad[3].position = sf::Vector2f(i * tileSize.x, (j + 1) * tileSize.y);
-
+				
 				// define its 4 texture coordinates
 				quad[0].texCoords = sf::Vector2f(tu * tileSize.x, tv * tileSize.y);
 				quad[1].texCoords = sf::Vector2f((tu + 1) * tileSize.x, tv * tileSize.y);
@@ -69,60 +69,31 @@ private:
 	sf::Texture m_tileset;
 };
 
-void LoadLevel(int* level, int height, int width, NoiseMap heightMap)
+void LoadLevel(int* level, int height, int width, module::Perlin heightMap)
 {
 	int ind = 0;
 
-	for (int i = 0; i <= height - 1; ++i)
+	for (int i = 0; i <= width - 1; ++i)
 	{
 		std::cout << "ROW" << i << std::endl;
-		for (int j = 0; j <= width - 1; ++j)
+		for (int j = 0; j <= height - 1; ++j)
 		{
-			float val = heightMap.GetValue(j, i);
+			float val = heightMap.GetValue(j * 0.1, i * 0.1, 0);
 			std::cout << val;
-			/*
-			if (val >= -1.00 && val < -0.25) //deeps
+			
+			if (val >= -1.00 && val < -0.5)
 			{
 				*(level + ind) = 0;
 			}
-			else if (val >= -0.25 && val < 0.00) //shallow
-			{
-				*(level+ind) = 1;
-			}
-			else if (val >= 0.00 && val < 0.0625) //shore
-			{
-				*(level + ind) = 2;
-			}
-			else if (val >= 0.625 && val < 0.125) //sand
-			{
-				*(level+ind) = 3;
-			}
-			else if (val >= 0.125 && val < 0.375) //grass
-			{
-				*(level+ind) = 4;
-			}
-			else if (val >= 0.375 && val < 0.75) //dirt
-			{
-				*(level+ind) = 5;
-			}
-			else if (val >= 0.75 && val <= 1) //rock
-			{
-				*(level+ind) = 6;
-			}
-			*/
-			if (val >= -1.00 && val < -0.50) 
-			{
-				*(level + ind) = 0;
-			}
-			else if (val >= -0.50 && val < 0.00) 
+			else if (val >= -0.5 && val < 0.0)
 			{
 				*(level + ind) = 1;
 			}
-			else if (val >= 0.00 && val < 0.50) 
+			else if (val >= 0.0 && val < 0.5)
 			{
 				*(level + ind) = 2;
 			}
-			else if (val >= 0.50 && val <= 1.0) 
+			else if (val >= 0.5 && val <= 1.0)
 			{
 				*(level + ind) = 3;
 			}
@@ -136,30 +107,20 @@ void LoadLevel(int* level, int height, int width, NoiseMap heightMap)
 int main() {
 	
 	int height = 32;
-	int width = 16;
+	int width = 32;
 	int size = height * width;
 	
 	module::Perlin myModule;
-	noise::utils::NoiseMap heightMap;
 
-	utils::NoiseMapBuilderPlane heightMapBuilder;
-	
-	heightMapBuilder.SetSourceModule(myModule);
-	heightMapBuilder.SetDestNoiseMap(heightMap);
-	heightMapBuilder.SetDestSize(width, height);
-	heightMapBuilder.SetBounds(2.0, 10.0, 1.0, 5.0);
-	heightMapBuilder.Build();
-	
 	// create the window
-	sf::RenderWindow window(sf::VideoMode(512, 256), "Tielmap");
+	sf::RenderWindow window(sf::VideoMode(512, 512), "Tielmap");
 
 	int *level = NULL;
 	level = new int[height * width];
-	memset(level, 0x00, height*width);
-	LoadLevel(level, height, width, heightMap);
+	LoadLevel(level, height, width, myModule);
 	
 	TileMap map;
-	if (!map.load("tileMap.png", sf::Vector2u(16, 16), level, 32, 16))
+	if (!map.load("tileMap.png", sf::Vector2u(16, 16), level, 32, 32))
 		return -1;
 
 	// run the main loop
@@ -176,19 +137,13 @@ int main() {
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
 			myModule.SetSeed(std::rand());
-			heightMapBuilder.SetSourceModule(myModule);
-			heightMapBuilder.SetDestNoiseMap(heightMap);
-			heightMapBuilder.SetDestSize(width, height);
-			heightMapBuilder.SetBounds(2.0, 10.0, 1.0, 5.0);
-			heightMapBuilder.Build();
-
 			
-			if (!map.load("tileMap.png", sf::Vector2u(16, 16), level, 32, 16))
+			if (!map.load("tileMap.png", sf::Vector2u(16, 16), level, 32, 32))
 				return -1;
 
+			LoadLevel(level, height, width, myModule);
 		}
 
-		LoadLevel(level, height, width, heightMap);
 		// draw the map
 		window.clear();
 		window.draw(map);

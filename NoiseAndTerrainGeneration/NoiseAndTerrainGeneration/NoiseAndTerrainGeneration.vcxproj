@@ -158,6 +158,7 @@
     <Image Include="overworld.png" />
     <Image Include="tileMap.png" />
     <Image Include="tileset.png" />
+    <Image Include="tilesSmall.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
